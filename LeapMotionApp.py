@@ -109,6 +109,12 @@ class LeapMotionListener(Leap.Listener):
             elif (int(round(normalRight[1])) == 1):
                 #print "Normal"
                 SendInput(Keyboard(KEY_T, KEYEVENTF_EXTENDEDKEY))
+                # scratch
+            elif ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) > 80):
+                SendInput(Keyboard(KEY_J))
+            elif ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) < -80):
+                SendInput(Keyboard(KEY_U))
+
 
             SendInput(Keyboard(KEY_G, KEYEVENTF_KEYUP))
             SendInput(Keyboard(KEY_T, KEYEVENTF_KEYUP))
@@ -127,10 +133,7 @@ class LeapMotionListener(Leap.Listener):
                 SendInput(Keyboard(KEY_S))
 
 
-            if ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) > 80):
-                SendInput(Keyboard(KEY_J))
-            elif ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) < -80):
-                SendInput(Keyboard(KEY_U))
+
 
             '''
             print "Normal: " + str(int(round(normalRight[0]))) + " " + str(int(round(normalRight[1]))) + " " + str(int(round(normalRight[2]))) \

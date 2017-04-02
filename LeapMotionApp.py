@@ -47,20 +47,108 @@ class LeapMotionListener(Leap.Listener):
                 rightHandInFrame = True
 
 
-#        normal = hand.palm_normal
-#        previousNormal = int(round(normal[1]))
+
 
         #win32api.SetCursorPos((int(hand.palm_position[0]), int(hand.palm_position[1])
 
         #print handType + " Hand ID: " + str(hand.id) + " Palm Position: " + str(hand.palm_position)
         #print "Pitch: " + str(direction.pitch * Leap.RAD_TO_DEG) + " Roll: " + str(normal.roll * Leap.RAD_TO_DEG) + " Yaw: " + str(direction.yaw * Leap.RAD_TO_DEG)
+        if (leftHandInFrame):
+            normalLeft = leftHand.palm_normal
+            velocityLeft = leftHand.palm_velocity
+            pinchLeft = leftHand.pinch_strength
+
+            # left hand controlling play and pause of left deck
+            if (leftHand.grab_strength == 1):
+                SendInput(Keyboard(KEY_P, KEYEVENTF_EXTENDEDKEY))
+                #print "play"
+            elif (int(round(normalLeft[1])) == 1):
+                #print "Normal"
+                SendInput(Keyboard(VK_SPACE, KEYEVENTF_EXTENDEDKEY))
+
+            SendInput(Keyboard(VK_SPACE, KEYEVENTF_KEYUP))
+            SendInput(Keyboard(KEY_P, KEYEVENTF_KEYUP))
+
+            # left hand controlling the volume on the left deck
+            if ((pinchLeft == 1) and (int(round(velocityLeft[1])) > 80)):
+                SendInput(Keyboard(KEY_Q))
+            elif ((pinchLeft == 1) and (int(round(velocityLeft[1])) < -80)):
+                SendInput(Keyboard(KEY_A))
+
+        clockwiseness = "no circle"
+            # left hand controlling pitch with circle gestures
+        for gesture in frame.gestures():
+            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+                circle = CircleGesture(gesture)
+                if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/2:
+                    clockwiseness = "clockwise"
+                    SendInput(Keyboard(KEY_F, KEYEVENTF_EXTENDEDKEY))
+                else:
+                    clockwiseness = "counter-clockwise"
+                    SendInput(Keyboard(KEY_D, KEYEVENTF_EXTENDEDKEY))
+
+                swept_angle = 0
+
+
+                if circle.state != Leap.Gesture.STATE_START:
+                    previous = CircleGesture(controller.frame(1).gesture(circle.id))
+
+
+
         if (rightHandInFrame):
+            normalRight = rightHand.palm_normal
+            velocityRight = rightHand.palm_velocity
+            pinchRight = rightHand.pinch_strength
+
+
+            # right hand controlling play and pause of right deck
+
             if (rightHand.grab_strength == 1):
-                SendInput(Keyboard(VK_LEFT, KEYEVENTF_EXTENDEDKEY))
-                print "Pitch"
-            else:
-                print "Normal"
-                SendInput(Keyboard(VK_LEFT, KEYEVENTF_KEYUP))
+                SendInput(Keyboard(KEY_G, KEYEVENTF_EXTENDEDKEY))
+                #print "play"
+            elif (int(round(normalRight[1])) == 1):
+                #print "Normal"
+                SendInput(Keyboard(KEY_T, KEYEVENTF_EXTENDEDKEY))
+
+            SendInput(Keyboard(KEY_G, KEYEVENTF_KEYUP))
+            SendInput(Keyboard(KEY_T, KEYEVENTF_KEYUP))
+
+            # right hand controlling the cross fade with a pinch as long as it is near the Leap device
+            if ((pinchRight == 1) and (int(round(velocityRight[0])) > 80)):
+                SendInput(Keyboard(VK_PRIOR))
+            elif ((pinchRight == 1) and (int(round(velocityRight[0])) < -80)):
+                SendInput(Keyboard(VK_NEXT))
+
+            # right hand controlling the volume on the right deck
+
+            elif ((pinchRight == 1) and (int(round(velocityRight[1])) > 80)):
+                SendInput(Keyboard(KEY_W))
+            elif ((pinchRight == 1) and (int(round(velocityRight[1])) < -80)):
+                SendInput(Keyboard(KEY_S))
+
+
+            if ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) > 80):
+                SendInput(Keyboard(KEY_J))
+            elif ((int(round(normalRight[1])) == -1) and int(round(velocityRight[2])) < -80):
+                SendInput(Keyboard(KEY_U))
+
+            '''
+            print "Normal: " + str(int(round(normalRight[0]))) + " " + str(int(round(normalRight[1]))) + " " + str(int(round(normalRight[2]))) \
+                + " Velocity: " + str(int(round(velocityRight[0]))) + " " + str(int(round(velocityRight[1]))) + " " + str(int(round(velocityRight[2])))
+            '''
+        SendInput(Keyboard(KEY_U, KEYEVENTF_KEYUP))
+        SendInput(Keyboard(KEY_J, KEYEVENTF_KEYUP))
+
+        SendInput(Keyboard(KEY_D, KEYEVENTF_KEYUP))
+        SendInput(Keyboard(KEY_F, KEYEVENTF_KEYUP))
+
+        SendInput(Keyboard(VK_NEXT,  KEYEVENTF_KEYUP))
+        SendInput(Keyboard(VK_PRIOR, KEYEVENTF_KEYUP))
+
+
+
+
+
 
     '''    direction = hand.direction
 
